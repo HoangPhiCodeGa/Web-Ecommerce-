@@ -1,5 +1,9 @@
-package com.iuh.backend.configuration;
+package com.backend.configuration;
 
+import com.backend.service.impl.AuthServiceImpl;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -16,7 +20,12 @@ import java.util.List;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class AuthenticationFilter implements GlobalFilter, Ordered {
+    AuthServiceImpl authService;
+
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         log.info("Enter into Auth Filter...");
