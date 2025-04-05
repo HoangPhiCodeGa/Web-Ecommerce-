@@ -18,7 +18,6 @@ import com.backend.commonservice.model.ErrorMessage;
 import com.backend.commonservice.model.ItemNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,13 +39,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(AppException.class)
     public ResponseEntity<Map<String, Object>> handleAppException(AppException ex) {
         Map<String, Object> errors = new LinkedHashMap<>();
         ErrorMessage error = ex.getErrorCode();
-        errors.put("status", error.getHttpStatus());
+        errors.put("status", error.getHttpStatus().value());
         errors.put("message", error.getMessage());
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors, error.getHttpStatus());
     }
+    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -60,11 +61,20 @@ public class GlobalExceptionHandler {
     }
 
     // Exception này sẽ được xử lý khi người dùng không có quyền truy cập vào một tài nguyên nào đó
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException ex) {
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
         Map<String, Object> errors = new LinkedHashMap<>();
-        ErrorMessage error = ErrorMessage.UNAUTHORIZED;
-        errors.put("status", error.getHttpStatus());
+        errors.put("status", HttpStatus.FORBIDDEN.value());
+        errors.put("message", "Bạn không có quyền truy cập vào tài nguyên này");
+        return new ResponseEntity<>(errors, HttpStatus.FORBIDDEN);
+    }
+
+    // Exception này sẽ xử lý trường hợp người dùng gửi request không hợp lệ
+    @ExceptionHandler(com.backend.commonservice.model.AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleCustomAccessDeniedException(com.backend.commonservice.model.AccessDeniedException ex) {
+        Map<String, Object> errors = new LinkedHashMap<>();
+        ErrorMessage error = ex.getErrorCode();
+        errors.put("status", error.getHttpStatus().value());
         errors.put("message", error.getMessage());
         return new ResponseEntity<>(errors, error.getHttpStatus());
     }
@@ -77,5 +87,4 @@ public class GlobalExceptionHandler {
         errors.put("message", ex.getMessage());
         return new ResponseEntity<>(errors, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }
