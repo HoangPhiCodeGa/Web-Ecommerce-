@@ -14,5 +14,7 @@ public interface OrderService {
 
     OrderResponse update(Long id, OrderDTO order);
 
+    OrderResponse updateStatus(Long id, String status);
+
     boolean delete(Long id);
 }

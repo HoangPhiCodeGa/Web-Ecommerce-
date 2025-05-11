@@ -61,7 +61,7 @@ public class JWTServiceImpl implements JWTService {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 30 * 60 * 1000)) // 30 phút
+                .setExpiration(new Date(System.currentTimeMillis() + 30 * 600* 1000)) // 30 phút
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -14,7 +14,7 @@ import com.backend.orderservice.domain.Order;
 import com.backend.orderservice.dtos.OrderDTO;
 import com.backend.orderservice.dtos.response.OrderResponse;
 import com.backend.orderservice.enums.OrderStatus;
-import com.backend.orderservice.event.OrderProducer;
+//import com.backend.orderservice.event.OrderProducer;
 import com.backend.orderservice.repository.OrderRepository;
 import com.backend.orderservice.service.OrderService;
 import org.modelmapper.ModelMapper;
@@ -28,12 +28,19 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository productRep;
     private final ModelMapper modelMapper;
-    private final OrderProducer orderProducer;
+    private final OrderRepository orderRepository;
+//    private final OrderProducer orderProducer;
 
-    public OrderServiceImpl(OrderRepository productRep, ModelMapper modelMapper, OrderProducer orderProducer) {
+//    public OrderServiceImpl(OrderRepository productRep, ModelMapper modelMapper, OrderProducer orderProducer) {
+//        this.productRep = productRep;
+//        this.modelMapper = modelMapper;
+//        this.orderProducer = orderProducer;
+//    }
+
+    public OrderServiceImpl(OrderRepository productRep, ModelMapper modelMapper, OrderRepository orderRepository) {
         this.productRep = productRep;
         this.modelMapper = modelMapper;
-        this.orderProducer = orderProducer;
+        this.orderRepository = orderRepository;
     }
 
     //    Convert Entity to DTO
@@ -70,11 +77,11 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = productRep.save(order);
         
         // Gửi sự kiện đơn hàng mới đến Kafka
-        orderProducer.sendOrderEvent(
-                savedOrder.getId(),
-                savedOrder.getCustomerId(),
-                savedOrder.getStatus(),
-                savedOrder.getTongTien());
+//        orderProducer.sendOrderEvent(
+//                savedOrder.getId(),
+//                savedOrder.getCustomerId(),
+//                savedOrder.getStatus(),
+//                savedOrder.getTongTien());
                 
         return convertToDTO(savedOrder);
     }
@@ -93,15 +100,32 @@ public class OrderServiceImpl implements OrderService {
         Order updatedOrder = productRep.save(orderToUpdate);
         
         // Nếu trạng thái đơn hàng thay đổi, gửi sự kiện đến Kafka
-        if (updatedOrder.getStatus() != oldStatus) {
-            orderProducer.sendOrderEvent(
-                    updatedOrder.getId(),
-                    updatedOrder.getCustomerId(),
-                    updatedOrder.getStatus(),
-                    updatedOrder.getTongTien());
-        }
+//        if (updatedOrder.getStatus() != oldStatus) {
+//            orderProducer.sendOrderEvent(
+//                    updatedOrder.getId(),
+//                    updatedOrder.getCustomerId(),
+//                    updatedOrder.getStatus(),
+//                    updatedOrder.getTongTien());
+//        }
         
         return convertToDTO(updatedOrder);
+    }
+
+    @Transactional
+    @Override
+    public OrderResponse updateStatus(Long id, String status) {
+        Order existingOrder = productRep.findById(id).orElseThrow(
+                () -> new AppException(ErrorMessage.RESOURCE_NOT_FOUND));
+
+        // Lưu trạng thái cũ để kiểm tra xem có thay đổi không
+        OrderStatus oldStatus = existingOrder.getStatus();
+
+        OrderStatus orderStatus = OrderStatus.fromVietnameseLabel(status);
+        existingOrder.setStatus(orderStatus);
+
+        orderRepository.save(existingOrder);
+
+        return convertToDTO(existingOrder);
     }
 
     @Transactional

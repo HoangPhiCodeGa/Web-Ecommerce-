@@ -62,6 +62,7 @@ public class UserController {
 
     @GetMapping("/user")
     public ResponseEntity<ApiResponseDTO<Map<String, Object>>> getAllUsers() {
+        log.error("start function get all user");
         ApiResponseDTO<Map<String, Object>> response = new ApiResponseDTO<>();
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("users", userService.findAll());

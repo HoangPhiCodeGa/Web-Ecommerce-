@@ -60,11 +60,26 @@ public class JwtGlobalFilter implements GlobalFilter, Ordered {
     private final List<OpenApiEndpoint> openApiEndpoints = Arrays.asList(
             new OpenApiEndpoint("POST", "/api/account/sign-up"),
             new OpenApiEndpoint("POST", "/api/account/sign-in"),
+
+            //----product, category
             new OpenApiEndpoint("GET", "/api/v1/products"),
+
+            new OpenApiEndpoint("GET", "/api/v1/category"),
+            new OpenApiEndpoint("GET", "/api/category"),
+            new OpenApiEndpoint("DELETE", "/api/category/{id}"),
+            new OpenApiEndpoint("POST", "/api/category"),
+
+            //----user, account
+            new OpenApiEndpoint("GET", "/api/v1/user"),
             new OpenApiEndpoint("POST", "/api/user"),
             new OpenApiEndpoint("POST", "/api/user/create"),
+
             new OpenApiEndpoint("POST", "/api/payment/vn-pay/create-payment"),
-            new OpenApiEndpoint("POST", "/api/payment/vn-pay/payment-info")
+            new OpenApiEndpoint("POST", "/api/payment/vn-pay/payment-info"),
+            new OpenApiEndpoint("GET", "/api/account/swagger-ui.html"),
+            new OpenApiEndpoint("GET", "/api/account/swagger-ui/**"),
+            new OpenApiEndpoint("GET", "/api/account/v3/api-docs/**"),
+            new OpenApiEndpoint("GET", "/api/account/swagger-resources/**")
     );
 
     @Override

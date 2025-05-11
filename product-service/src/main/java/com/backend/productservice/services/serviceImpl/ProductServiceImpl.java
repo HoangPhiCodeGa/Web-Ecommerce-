@@ -69,7 +69,8 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new AppException(ErrorMessage.RESOURCE_NOT_FOUND));
         Product p = toProduct(product);
         String hinhAnhURL = cloudinaryService.uploadImage(hinhAnh);
-        p.setHinhAnh(hinhAnhURL);
+//        p.setHinhAnh(hinhAnhURL);
+        p.setHinhAnh(product.getHinhAnhUrl());
         p.setCategory(c);
         productRep.save(p);
         return toProductReponse(p);

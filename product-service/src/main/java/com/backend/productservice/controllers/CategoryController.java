@@ -22,7 +22,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/categories")
 @Tag(name = "Category Query", description = "Category API")
 public class CategoryController {
     private final CategoryService categoryService;
@@ -55,7 +55,7 @@ public class CategoryController {
         if (keyword == null || keyword.isEmpty()) {
             response.put("data", categoryService.getAll());
         } else {
-//            response.put("data", productService.search(keyword));
+//            response.put("data", categoryService.search(keyword));
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

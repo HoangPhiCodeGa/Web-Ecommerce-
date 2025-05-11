@@ -49,8 +49,12 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             return result.get("secure_url").toString();
         } catch (IOException io) {
             log.error("Failed to upload image: {}", io.getMessage());
-            throw new RuntimeException("Image upload failed: " + io.getMessage());
+//            throw new RuntimeException("Image upload failed: " + io.getMessage());
         }
+        catch (Exception e){
+
+        }
+        return null;
     }
     private void validateFile(MultipartFile file) {
         // Check if file is empty

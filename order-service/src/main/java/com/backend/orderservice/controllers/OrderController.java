@@ -23,6 +23,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+//@CrossOrigin(origins = "http://localhost:9090")
+@CrossOrigin(origins = "http://localhost:9090",
+        allowedHeaders = "*",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+
 @RestController
 @RequestMapping("/api/v1/orders")
 @Tag(name = "Order Query", description = "Order API")
@@ -68,6 +73,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+
     @Operation(
             description = "Save order",
             summary = "Save order",
@@ -86,7 +92,7 @@ public class OrderController {
 
             }
     )
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<OrderDTO> save(@Valid @RequestBody
                                          @io.swagger.v3.oas.annotations.parameters.RequestBody(
                                                  description = "Order object that needs to be added to the store",
@@ -173,6 +179,12 @@ public class OrderController {
         orderService.update(id, orderDTO);
         return new ResponseEntity<>(orderDTO, HttpStatus.OK);
 
+    }
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity updateStatus(@PathVariable Long id, @RequestParam String status){
+        OrderResponse orderDTO =  orderService.updateStatus(id, status);
+        return new ResponseEntity<>(orderDTO, HttpStatus.OK);
     }
 
     @Operation(
