@@ -9,14 +9,15 @@ package com.backend.orderservice.controllers;
  */
 
 import com.backend.commonservice.service.KafkaService;
-import com.backend.orderservice.domain.Order;
 import com.backend.orderservice.dtos.OrderDTO;
+import com.backend.orderservice.dtos.request.CartOrderRequest;
 import com.backend.orderservice.dtos.response.OrderResponse;
 import com.backend.orderservice.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//@CrossOrigin(origins = "http://localhost:9090")
-@CrossOrigin(origins = "http://localhost:9090",
-        allowedHeaders = "*",
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-
 @RestController
-@RequestMapping("/api/v1/orders")
+@RequestMapping("/orders")
 @Tag(name = "Order Query", description = "Order API")
+@Slf4j
 public class OrderController {
     private final OrderService orderService;
     private final KafkaService kafkaService;
@@ -74,7 +71,6 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-
     @Operation(
             description = "Save order",
             summary = "Save order",
@@ -93,24 +89,19 @@ public class OrderController {
 
             }
     )
-    @PostMapping("/create")
-    public ResponseEntity<OrderDTO> save(@Valid @RequestBody
-                                         @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                                                 description = "Order object that needs to be added to the store",
-                                                 required = true,
-                                                 content = @io.swagger.v3.oas.annotations.media.Content(
-                                                         mediaType = "application/json",
-                                                         schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = OrderDTO.class)
-                                                 )
-                                         )
-
-                                         OrderDTO orderDTO
-
-
+    @PostMapping
+    public ResponseEntity<OrderResponse> save(@Valid @RequestBody
+                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                      description = "Order object that needs to be added to the store",
+                                                      required = true,
+                                                      content = @io.swagger.v3.oas.annotations.media.Content(
+                                                              mediaType = "application/json",
+                                                              schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = CartOrderRequest.class)
+                                                      )
+                                              ) CartOrderRequest cartOrderRequest
     ) {
-        OrderResponse order = orderService.save(orderDTO);
-        orderDTO.setId(order.getId());
-        return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
+        OrderResponse response = orderService.save(cartOrderRequest);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @Operation(
@@ -183,12 +174,6 @@ public class OrderController {
 
     }
 
-    @PutMapping("/updateStatus/{id}")
-    public ResponseEntity updateStatus(@PathVariable Long id, @RequestParam String status){
-        OrderResponse orderDTO =  orderService.updateStatus(id, status);
-        return new ResponseEntity<>(orderDTO, HttpStatus.OK);
-    }
-
     @Operation(
             description = "Get order by ID",
             summary = "Get order by ID",
@@ -214,15 +199,15 @@ public class OrderController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getById(@PathVariable
-                                            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                                                    description = "ID of order to return",
-                                                    required = true,
-                                                    content = @io.swagger.v3.oas.annotations.media.Content(
-                                                            mediaType = "application/json",
-                                                            schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = Long.class)
-                                                    )
-                                            )
-                                            Long id
+                                                 @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                         description = "ID of order to return",
+                                                         required = true,
+                                                         content = @io.swagger.v3.oas.annotations.media.Content(
+                                                                 mediaType = "application/json",
+                                                                 schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = Long.class)
+                                                         )
+                                                 )
+                                                 Long id
     ) {
         return new ResponseEntity<>(orderService.getById(id), HttpStatus.OK);
     }

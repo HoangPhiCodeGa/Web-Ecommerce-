@@ -6,8 +6,7 @@
 
 package com.backend.paymentservice.services;
 
-
-import com.backend.paymentservice.dtos.PaymentDTO;
+import com.backend.paymentservice.entity.PaymentInfo;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.UnsupportedEncodingException;
@@ -19,6 +18,11 @@ import java.io.UnsupportedEncodingException;
  * @created: 25-April-2025 11:00 PM
  */
 public interface PaymentService {
-    public String createVNPPayment(HttpServletRequest request, long amountRequest, long idOrder) throws UnsupportedEncodingException;
-}
+    String createVNPPayment(HttpServletRequest request, long amountRequest) throws UnsupportedEncodingException;
 
+    boolean processRefund(Long orderId);
+
+    void save(PaymentInfo paymentInfo);
+
+    void update(HttpServletRequest request);
+}

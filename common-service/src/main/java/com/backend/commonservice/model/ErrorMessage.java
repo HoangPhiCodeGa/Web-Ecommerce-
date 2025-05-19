@@ -1,6 +1,5 @@
 package com.backend.commonservice.model;
 
-
 /*
  * @description
  * @author: Pham Kim Khuong
@@ -48,10 +47,17 @@ public enum ErrorMessage {
     CART_NOT_FOUND("Không tìm thấy giỏ hàng", 404, HttpStatus.NOT_FOUND),
     // Giỏ hàng đã tồn tại cho khách hàng này
     CART_ALREADY_EXISTS("Giỏ hàng đã tồn tại cho khách hàng này", 400, HttpStatus.BAD_REQUEST),
+    // Thanh toán thất bại
+    PAYMENT_FAILED("Thanh toán thất bại", 400, HttpStatus.BAD_REQUEST),
+    // Cập nhật tồn kho thất bại
+    INVENTORY_UPDATE_FAILED("Cập nhật tồn kho thất bại", 400, HttpStatus.BAD_REQUEST),
+    // Kafka Lỗi
+    KAFKA_ERROR("Lỗi dịch v Kafka", 500, HttpStatus.INTERNAL_SERVER_ERROR),
+    // Dich vu xac thuc loi
     ;
+
     String message;
     int code;
     HttpStatus httpStatus;
-
 
 }

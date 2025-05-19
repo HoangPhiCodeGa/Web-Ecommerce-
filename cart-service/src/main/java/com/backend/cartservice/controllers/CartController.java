@@ -1,15 +1,15 @@
 package com.backend.cartservice.controllers;
 
-import com.backend.cartservice.dto.response.CartResponse;
 import com.backend.cartservice.entity.Cart;
-import com.backend.cartservice.entity.CartItem;
 import com.backend.cartservice.services.CartService;
+import com.backend.commonservice.dto.reponse.CartResponse;
+import com.backend.commonservice.dto.request.ApiResponseDTO;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -33,41 +33,22 @@ public class CartController {
     }
 
     // API để lấy giỏ hàng của khách hàng theo customerId
-    @GetMapping("/{customerId}")
+    @GetMapping("/customer/{customerId}")
     public ResponseEntity<CartResponse> getCart(@PathVariable Long customerId) {
-
-        Optional<Cart> cart = cartService.getCart(customerId);
-
-        if (cart.isPresent()) {
-            Cart c = cart.get();
-            c.updateTotalPrice();
-            CartResponse cartResponse = CartResponse.builder()
-                    .id(c.getId())
-                    .customerId(c.getCustomerId())
-                    .totalPrice(c.getTotalPrice())
-                    .count(c.getCartItems().size())
-                    .build();
-            return ResponseEntity.ok(cartResponse);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Optional<CartResponse> cart = cartService.getCart(customerId);
+        return cart.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/count/{customerId}")
-    public int getCountCart(@PathVariable Long customerId){
-        try {
-            Optional<Cart> cart = cartService.getCart(customerId);
-
-            if (cart.isPresent()) {
-                return cart.get().getCartItems().size();
-            } else {
-                return 0;
-            }
-
-        }catch (Exception e){
-            return 0;
-        }
+    @GetMapping("/id/{cartId}")
+    public ApiResponseDTO<CartResponse> getCartById(@PathVariable Long cartId) {
+        ApiResponseDTO<CartResponse> response = new ApiResponseDTO<>();
+        CartResponse cart = cartService.getCartById(cartId);
+        response.setData(cart);
+        response.setMessage("Lấy giỏ hàng thành công");
+        response.setCode(HttpStatus.OK.value());
+        return response;
     }
+
 
     // API để cập nhật giỏ hàng
     @PutMapping("/{cartId}")
@@ -85,7 +66,7 @@ public class CartController {
     @DeleteMapping("/delete/{cartId}")
     public ResponseEntity<Void> deleteCart(@PathVariable Long cartId) {
         // Lấy thông tin giỏ hàng để kiểm tra tồn tại
-        Optional<Cart> cart = cartService.getCart(cartId);
+        Optional<CartResponse> cart = cartService.getCart(cartId);
         if (cart.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

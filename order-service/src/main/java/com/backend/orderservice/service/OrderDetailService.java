@@ -1,17 +1,18 @@
 package com.backend.orderservice.service;
 
-import com.backend.orderservice.dtos.OrderDetailDTO;
+import com.backend.orderservice.dtos.request.CreateOrderDetail;
+import com.backend.orderservice.dtos.response.OrderDetailResponse;
 
 import java.util.List;
 
 public interface OrderDetailService {
-    public List<OrderDetailDTO> getAll();
+    List<OrderDetailResponse> getAll();
 
-    public OrderDetailDTO getById(Long id);
+    OrderDetailResponse getById(Long id);
 
-    public OrderDetailDTO save(OrderDetailDTO order);
+    OrderDetailResponse save(CreateOrderDetail order);
 
-    public OrderDetailDTO update(Long id, OrderDetailDTO order);
+    OrderDetailResponse update(Long id, CreateOrderDetail order);
 
-    public boolean delete(Long id);
+    boolean delete(Long id);
 }

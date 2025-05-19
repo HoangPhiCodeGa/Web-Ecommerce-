@@ -21,7 +21,7 @@ import com.backend.repositories.AccountRepository;
 import com.backend.repositories.RoleRepository;
 import com.backend.services.AccountService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
@@ -29,25 +29,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import reactor.util.Logger;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
+
 @RepositoryRestController
 public class AccountController {
 
-    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
+    private static final Logger log = (Logger) LoggerFactory.getLogger(AccountController.class);
     @Autowired
     AccountService accountService;
-
-    @Autowired
-    AccountRepository accountRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -72,6 +72,14 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
+    @GetMapping("/account/get-email")
+    public ResponseEntity<?> getEmail(@RequestParam(value = "id") Long id) {
+        log.info("Get email user with id: {}", id);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", accountService.getEmailUser(id));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @PostMapping("/account/sign-in")
     public ResponseEntity<?> signInUser(@RequestBody @Valid SignInRequest signInRequest, BindingResult bindingResult) {
@@ -95,5 +103,17 @@ public class AccountController {
     }
 
 
+
+
+    @PostMapping("/account/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam("email") String email) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        ResponseEntity<?> result = accountService.forgotPassword(email);
+
+        response.put("status", result.getStatusCode().value());
+        response.put("message", result.getBody());
+
+        return ResponseEntity.status(result.getStatusCode()).body(response);
+    }
 
 }

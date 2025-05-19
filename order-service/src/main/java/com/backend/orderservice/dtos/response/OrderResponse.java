@@ -1,23 +1,22 @@
 package com.backend.orderservice.dtos.response;
 
-import com.backend.orderservice.dtos.OrderDetailDTO;
-import lombok.*;
+import com.backend.commonservice.enums.OrderStatus;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Builder
 public class OrderResponse {
     Long id;
-    LocalDate ngayDatHang;
+    LocalDateTime ngayDatHang;
     Double tongTien;
-    String status;
+    String trangThai;
     Long customerId;
-
-    private List<OrderDetailDTO> orderDetailDTOS;
 }

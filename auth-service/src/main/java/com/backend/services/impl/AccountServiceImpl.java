@@ -22,7 +22,9 @@ import com.backend.entities.Role;
 import com.backend.repositories.AccountRepository;
 import com.backend.repositories.RoleRepository;
 import com.backend.services.AccountService;
+import com.backend.services.EmailService;
 import com.backend.services.JWTService;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,22 +50,26 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@Transactional
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
-    private AccountRepository accountRepository;
-    private final RoleRepository roleRepository;
-    private final ModelMapper modelMapper;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final RestTemplate restTemplate;
+    AccountRepository accountRepository;
+    final RoleRepository roleRepository;
+    final ModelMapper modelMapper;
+    final BCryptPasswordEncoder passwordEncoder;
+    final RestTemplate restTemplate;
     @Autowired
     @Lazy
-    private JWTService jwtService;
+    JWTService jwtService;
+
+    @Autowired
+    private EmailService emailService;
+
 
     @Autowired
     public AccountServiceImpl(ModelMapper modelMapper, RoleRepository roleRepository,
-            BCryptPasswordEncoder passwordEncoder, AccountRepository accountRepository, RestTemplate restTemplate) {
+                              BCryptPasswordEncoder passwordEncoder, AccountRepository accountRepository, RestTemplate restTemplate) {
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.restTemplate = restTemplate;
@@ -98,7 +104,8 @@ public class AccountServiceImpl implements AccountService {
         HttpEntity<CreateUserRequest> request = new HttpEntity<>(createUserRequest, headers);
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    "http://localhost:8080/api/user/create", // Gọi qua API Gateway
+//                    "http://localhost:8080/api/user/create", // Gọi qua API Gateway
+                    "http://gateway-service:8080/api/user/create", // Gọi qua API Gateway
                     request,
                     String.class);
             if (response.getStatusCode() != HttpStatus.CREATED) {
@@ -111,6 +118,7 @@ public class AccountServiceImpl implements AccountService {
         }
         return ResponseEntity.status(HttpStatus.CREATED).body("Account created successfully!");
     }
+
     @Override
     public ResponseEntity<?> signIn(SignInRequest signInRequest, AuthenticationManager authenticationManager) {
         try {
@@ -129,6 +137,52 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account findByUsername(String username) {
         return accountRepository.findAccountByUsername(username);
+    }
+
+    @Override
+    public String getEmailUser(Long accountId) {
+        log.info("getEmailUser accountId: {}", accountId);
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new UsernameNotFoundException("Account not found"));
+        return account.getEmail();
+    }
+
+    @Override
+    public ResponseEntity<?> forgotPassword(String email) {
+        Account account = accountRepository.findAccountByEmail(email);
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email không tồn tại trong hệ thống.");
+        }
+
+        // Tạo mật khẩu mới ngẫu nhiên
+        String newPassword = generateRandomPassword(8); // Ví dụ: độ dài 8 ký tự
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        // Cập nhật vào DB
+        account.setPassword(encodedPassword);
+        accountRepository.save(account);
+
+        // Gửi email
+        String subject = "Khôi phục mật khẩu tài khoản";
+        String content = "<p>Xin chào <strong>" + account.getUsername() + "</strong>,</p>" +
+                "<p>Bạn đã yêu cầu khôi phục mật khẩu.</p>" +
+                "<p>Mật khẩu mới của bạn là: <strong>" + newPassword + "</strong></p>" +
+                "<p>Vui lòng đăng nhập và đổi mật khẩu ngay sau đó.</p>";
+        try {
+            emailService.sendMessage("no-reply@webecommerce.vn", email, subject, content);
+            return ResponseEntity.ok("Mật khẩu mới đã được gửi về email của bạn.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Không thể gửi email: " + e.getMessage());
+        }
+    }
+
+    private String generateRandomPassword(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            int index = (int) (Math.random() * characters.length());
+            sb.append(characters.charAt(index));
+        }
+        return sb.toString();
     }
 
     @Override

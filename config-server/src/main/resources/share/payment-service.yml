@@ -1,0 +1,28 @@
+server:
+  port: 9997
+  # Datasource configuration
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${MARIA_DB_PAYMENT_SERVICE:jdbc:mariadb://localhost:3306/payment_service?createDatabaseIfNotExist=true}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  # JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    defer-datasource-initialization: true
+  # SQL script to initialize the database
+  sql:
+    init:
+    # Only run the script for first time
+    #      mode: always
+#      mode: never
+#      data-locations: classpath:/sql/data.sql
+gateway:
+  service:
+    url: ${GATEWAY_SERVICE_URL:http://localhost:8080}
+#  data:
+#    rest:
+#      base-path: /api/v1

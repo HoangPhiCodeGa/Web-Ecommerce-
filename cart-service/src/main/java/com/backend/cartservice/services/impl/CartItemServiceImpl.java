@@ -2,7 +2,7 @@ package com.backend.cartservice.services.impl;
 
 import com.backend.cartservice.dto.request.CreateCartItem;
 import com.backend.cartservice.dto.request.UpdateCartItem;
-import com.backend.cartservice.dto.response.CartItemReponse;
+import com.backend.commonservice.dto.reponse.CartItemReponse;
 import com.backend.cartservice.entity.CartItem;
 import com.backend.cartservice.repository.CartItemRepository;
 import com.backend.cartservice.repository.OpenFeignClient.ProductClient;
@@ -68,7 +68,6 @@ public class CartItemServiceImpl implements CartItemService {
         CartItem c = cartItemRepository.save(cartItemEntity);
         return toCartItemRes(c);
     }
-
     // Lấy tất cả chi tiết giỏ hàng của giỏ hàng cụ thể
     public List<CartItem> getCartItems(Long cartId) {
         return cartItemRepository.findByCartId(cartId); // Lấy tất cả CartItem theo cartId
@@ -101,6 +100,13 @@ public class CartItemServiceImpl implements CartItemService {
         } else {
             throw new AppException(ErrorMessage.CART_ITEM_NOT_FOUND); // Thông báo lỗi nếu không tìm thấy
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteCartItemByCartId(Long cartId) {
+        log.info("CartItem gọi xóa tất cả sản phẩm trong giỏ hàng với ID: {}", cartId);
+        cartItemRepository.deleteCartItemByCart_Id(cartId);
     }
 
     // Lấy chi tiết giỏ hàng theo ID

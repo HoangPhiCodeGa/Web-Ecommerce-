@@ -4,9 +4,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/order_service?createDatabaseIfNotExist=true
-    username: root
-    password: root
+    url: ${MARIA_DB_ORDER_SERVICE:jdbc:mariadb://localhost:3306/order_service?createDatabaseIfNotExist=true}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
   # JPA configuration
   jpa:
     hibernate:
@@ -14,13 +14,21 @@ spring:
     show-sql: true
     defer-datasource-initialization: true
   # SQL script to initialize the database
+  logging:
+    level:
+      org.hibernate.SQL: INFO
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+      root: INFO
+      com.backend.orderservice: INFO
   sql:
     init:
     # Only run the script for first time
     #      mode: always
 #      mode: never
 #      data-locations: classpath:/sql/data.sql
-
+gateway:
+  service:
+    url: ${GATEWAY_SERVICE_URL:http://localhost:8080}
 #  data:
 #    rest:
 #      base-path: /api/v1

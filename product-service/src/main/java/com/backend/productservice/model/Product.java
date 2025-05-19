@@ -42,6 +42,9 @@ public class Product {
     String mauSac;
     @Column(name = "kich_co", nullable = false)
     String kichCo;
+    @Version
+    @Column(name = "version", nullable = false, columnDefinition = "bigint default 0")
+    private long version; // Field dùng cho optimistic locking
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "category_id")
