@@ -57,13 +57,22 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(request -> {
-                    CorsConfiguration corsConfig = new CorsConfiguration();
-                    corsConfig.addAllowedOrigin("*");
-                    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-                    corsConfig.addAllowedHeader("*");
-                    return corsConfig;
-                }))
+                // .cors(cors -> cors.configurationSource(request -> {
+                //     CorsConfiguration corsConfig = new CorsConfiguration();
+                //     corsConfig.addAllowedOrigin("*");
+                //     corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+                //     corsConfig.addAllowedHeader("*");
+                //     return corsConfig;
+                // }))
+
+//                .cors(cors -> cors.configurationSource(request -> {
+//                    CorsConfiguration corsConfig = new CorsConfiguration();
+//                    corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:9090"));
+//                    corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//                    corsConfig.setAllowedHeaders(Arrays.asList("*"));
+//                    corsConfig.setAllowCredentials(true);
+//                    return corsConfig;
+//                }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINS).permitAll()

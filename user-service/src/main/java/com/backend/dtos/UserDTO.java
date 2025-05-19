@@ -20,6 +20,15 @@ public class UserDTO implements Serializable {
     private String address;
     private LocalDate dateOfBirth;
     private boolean gender;
+    private String username;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public Long getUserId() {
         return userId;

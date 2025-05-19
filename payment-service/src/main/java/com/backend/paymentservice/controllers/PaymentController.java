@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 
+@CrossOrigin(origins = "http://localhost:9090",
+        allowedHeaders = "*",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @RestController
 public class PaymentController {
 
@@ -27,9 +30,9 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @PostMapping("/api/payment/vn-pay/create-payment")
-    public ResponseEntity<?> createPayment(HttpServletRequest request, @RequestParam("amount") long amount)
+    public ResponseEntity<?> createPayment(HttpServletRequest request, @RequestParam("amount") long amount, @RequestParam("idOrder") long idOrder)
             throws UnsupportedEncodingException {
-        String paymentUrl = paymentService.createVNPPayment(request, amount);
+        String paymentUrl = paymentService.createVNPPayment(request, amount, idOrder);
         return ResponseEntity.ok(paymentUrl);
     }
 

@@ -1,12 +1,15 @@
 package com.backend.cartservice.controllers;
 
+import com.backend.cartservice.dto.response.CartResponse;
 import com.backend.cartservice.entity.Cart;
+import com.backend.cartservice.entity.CartItem;
 import com.backend.cartservice.services.CartService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -31,9 +34,39 @@ public class CartController {
 
     // API để lấy giỏ hàng của khách hàng theo customerId
     @GetMapping("/{customerId}")
-    public ResponseEntity<Cart> getCart(@PathVariable Long customerId) {
+    public ResponseEntity<CartResponse> getCart(@PathVariable Long customerId) {
+
         Optional<Cart> cart = cartService.getCart(customerId);
-        return cart.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
+        if (cart.isPresent()) {
+            Cart c = cart.get();
+            c.updateTotalPrice();
+            CartResponse cartResponse = CartResponse.builder()
+                    .id(c.getId())
+                    .customerId(c.getCustomerId())
+                    .totalPrice(c.getTotalPrice())
+                    .count(c.getCartItems().size())
+                    .build();
+            return ResponseEntity.ok(cartResponse);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/count/{customerId}")
+    public int getCountCart(@PathVariable Long customerId){
+        try {
+            Optional<Cart> cart = cartService.getCart(customerId);
+
+            if (cart.isPresent()) {
+                return cart.get().getCartItems().size();
+            } else {
+                return 0;
+            }
+
+        }catch (Exception e){
+            return 0;
+        }
     }
 
     // API để cập nhật giỏ hàng

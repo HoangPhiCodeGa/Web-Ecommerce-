@@ -12,12 +12,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Tag(name = "OrderDetail Model", description = "OrderDetail Model Information")
 public class OrderDetailDTO {
     @Schema(description = "Mã chi tiết đơn hàng", hidden = true)

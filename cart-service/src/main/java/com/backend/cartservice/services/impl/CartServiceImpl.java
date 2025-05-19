@@ -25,7 +25,6 @@ public class CartServiceImpl implements CartService {
     }
 
     // Thêm giỏ hàng
-    @PreAuthorize("hasAuthority('ADMIN') or @cartSecurityExpression.isCustomer(#customerId)")
     public Cart addCart(Long customerId) {
         // Kiểm tra xem khách hàng có tồn tại không
         if (cartRepository.findByCustomerId(customerId).isPresent()) {
@@ -37,7 +36,6 @@ public class CartServiceImpl implements CartService {
     }
 
     // Lấy giỏ hàng của khách hàng
-    @PreAuthorize("hasAuthority('ADMIN') or @cartSecurityExpression.isCustomer(#customerId)")
     public Optional<Cart> getCart(Long customerId) {
         return cartRepository.findByCustomerId(customerId);
     }
@@ -50,7 +48,6 @@ public class CartServiceImpl implements CartService {
 
     // Cập nhật giỏ hàng
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or @cartSecurityExpression.isCartOwner(#cartId)")
     public Cart updateCart(Long cartId, Cart cart) {
         // Tìm giỏ hàng dựa trên cartId
         Optional<Cart> existingCartOpt = cartRepository.findById(cartId);
@@ -84,7 +81,6 @@ public class CartServiceImpl implements CartService {
 
 
     // Xóa giỏ hàng
-    @PreAuthorize("hasAuthority('ADMIN') or @cartSecurityExpression.isCartOwner(#cartId)")
     public void deleteCart(Long cartId) {
         cartRepository.deleteById(cartId);
     }

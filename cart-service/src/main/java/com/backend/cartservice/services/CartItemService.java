@@ -22,4 +22,8 @@ public interface CartItemService {
 
     // Lấy chi tiết giỏ hàng theo ID
     CartItem getCartItemById(Long cartItemId);
+
+    boolean plus(CartItem cartItem);
+
+    boolean minus(CartItem cartItem);
 }

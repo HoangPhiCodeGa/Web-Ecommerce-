@@ -57,24 +57,22 @@ public class ProductController {
                 return response;
         }
 
-        @Operation(summary = "Add Product", description = "Save a Product to database with image upload", responses = {
-                        @ApiResponse(responseCode = "200", description = "Successful"),
-                        @ApiResponse(responseCode = "500", description = "Internal server error"),
+        @Operation(summary = "Add Product", description = "Save a product json", responses = {
+                @ApiResponse(responseCode = "200", description = "Successful"),
+                @ApiResponse(responseCode = "500", description = "Internal server error"),
         })
-        @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-        public ApiResponseDTO<ProductReponse> saveProduct(
-                        @RequestPart(name = "request") @Valid @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Product object that needs to be added to the store", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductCreationRequest.class))) ProductCreationRequest request,
-
-                        @RequestPart(name = "hinhAnh") @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Image file to upload", required = true, content = @Content(mediaType = "multipart/form-data", schema = @Schema(type = "string", format = "binary"))) MultipartFile hinhAnh) {
+        @PostMapping()
+        public ApiResponseDTO<ProductReponse> saveProduct2(@RequestBody  ProductCreationRequest request) {
                 log.info("Save Product Controller start...");
                 log.info("request: {}", request);
-                ProductReponse p = productService.saveProduct(request, hinhAnh);
+                ProductReponse p = productService.saveProduct(request, null);
                 ApiResponseDTO<ProductReponse> response = new ApiResponseDTO<>();
                 response.setCode(HttpStatus.CREATED.value());
                 response.setMessage("Save product successfully");
                 response.setData(p);
                 return response;
         }
+
 
         @Operation(summary = "Delete Product", description = "Delete a Product from database", responses = {
                         @ApiResponse(responseCode = "200", description = "Successful"),

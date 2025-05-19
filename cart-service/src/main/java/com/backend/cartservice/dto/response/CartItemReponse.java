@@ -21,5 +21,7 @@ public class CartItemReponse {
     Long productId;
     double price;
     int quantity;
+    private String name;
+    private String image;
     Long version;
 }

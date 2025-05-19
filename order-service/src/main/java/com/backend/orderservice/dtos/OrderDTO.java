@@ -19,6 +19,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -42,4 +43,5 @@ public class OrderDTO {
     @JsonIgnore
     private OrderDetail orderDetail;
 
+    private List<OrderDetailDTO> orderDetailDTOS;
 }

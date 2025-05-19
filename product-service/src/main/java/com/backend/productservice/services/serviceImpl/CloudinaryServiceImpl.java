@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,9 +52,53 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             return result.get("secure_url").toString();
         } catch (IOException io) {
             log.error("Failed to upload image: {}", io.getMessage());
-            throw new RuntimeException("Image upload failed: " + io.getMessage());
+//            throw new RuntimeException("Image upload failed: " + io.getMessage());
+        }
+        catch (Exception e){
+
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getAllImages() {
+        try {
+            Map result = cloudinary.api().resources(ObjectUtils.asMap(
+                    "type", "upload",
+                    "resource_type", "image",
+                    "max_results", 500
+            ));
+
+            List<Map> resources = (List<Map>) result.get("resources");
+            return resources.stream()
+                    .map(res -> (String) res.get("secure_url"))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Failed to fetch images from Cloudinary: {}", e.getMessage());
+            return Collections.emptyList();
         }
     }
+
+    @Override
+    public boolean deleteImageByName(String publicId) {
+        try {
+            Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.asMap(
+                    "resource_type", "image"
+            ));
+
+            String status = (String) result.get("result");
+            if ("ok".equals(status)) {
+                log.info("Deleted image successfully: {}", publicId);
+                return true;
+            } else {
+                log.warn("Failed to delete image: {}, result: {}", publicId, status);
+            }
+        } catch (Exception e) {
+            log.error("Error deleting image from Cloudinary: {}", e.getMessage());
+        }
+        return false;
+    }
+
     private void validateFile(MultipartFile file) {
         // Check if file is empty
         if (file == null || file.isEmpty()) {

@@ -69,7 +69,8 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new AppException(ErrorMessage.RESOURCE_NOT_FOUND));
         Product p = toProduct(product);
         String hinhAnhURL = cloudinaryService.uploadImage(hinhAnh);
-        p.setHinhAnh(hinhAnhURL);
+//        p.setHinhAnh(hinhAnhURL);
+        p.setHinhAnh(product.getHinhAnh());
         p.setCategory(c);
         productRep.save(p);
         return toProductReponse(p);
@@ -80,6 +81,20 @@ public class ProductServiceImpl implements ProductService {
     public ProductReponse updateProduct(Long id, ProductCreationRequest product) {
         log.info("In method update Product");
         Product p = productRep.findById(id).orElseThrow(() -> new AppException(ErrorMessage.RESOURCE_NOT_FOUND));
+
+        Category c = categorytRep.findById(product.getCategory_id())
+                .orElseThrow(() -> new AppException(ErrorMessage.RESOURCE_NOT_FOUND));
+        p.setTenSP(product.getTenSP());
+        p.setMoTa(product.getMoTa());
+        p.setGiaBan(product.getGiaBan());
+        p.setGiaNhap(product.getGiaNhap());
+        p.setGiaGoc(product.getGiaGoc());
+        p.setSoLuong(product.getSoLuong());
+        p.setMauSac(product.getMauSac());
+        p.setKichCo(product.getKichCo());
+        p.setHinhAnh(product.getHinhAnh());
+
+        log.error("product updating....." + product);
         return toProductReponse(productRep.save(p));
     }
 

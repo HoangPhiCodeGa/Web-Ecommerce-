@@ -28,7 +28,7 @@ import java.util.*;
 public class PaymentServiceImpl implements PaymentService {
 
     @Override
-    public String createVNPPayment(HttpServletRequest request, long amountRequest) throws UnsupportedEncodingException {
+    public String createVNPPayment(HttpServletRequest request, long amountRequest, long idOrder) throws UnsupportedEncodingException {
         String orderType = "other";
         long amount = amountRequest * 100;
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -43,11 +43,13 @@ public class PaymentServiceImpl implements PaymentService {
         vnp_Params.put("vnp_Amount", String.valueOf(amount));
         vnp_Params.put("vnp_CurrCode", "VND");
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        vnp_Params.put("vnp_OrderInfo", "" + idOrder);
         vnp_Params.put("vnp_OrderType", orderType);
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_ReturnUrl", VNPayConfig.vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+//        vnp_Params.put("vnp_MerchantOrderId", idOrder + "");
+
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");

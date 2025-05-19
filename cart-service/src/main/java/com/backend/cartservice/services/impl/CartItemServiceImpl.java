@@ -47,7 +47,6 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Transactional
     // Thêm chi tiết giỏ hàng
-    @PreAuthorize("hasAuthority('ADMIN') or @cartSecurityExpression.isCartOwner(#cartItem.cartId)")
     public CartItemReponse addCartItem(CreateCartItem cartItem) {
         // Kiểm tra số lượng sản phẩm trong kho trước khi thêm vào giỏ hàng
         checkProductAvailability(cartItem.getProductId(), cartItem.getQuantity());
@@ -77,7 +76,6 @@ public class CartItemServiceImpl implements CartItemService {
 
     // Cập nhật chi tiết giỏ hàng
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or @cartSecurityExpression.isCartOwner(#cartItem.cartId)")
     public CartItemReponse updateCartItem(UpdateCartItem cartItem) {
         log.info("Cập nhật chi tiết giỏ hàng với ID: {}", cartItem.getId());
         // Kiểm tra nếu CartItem đã tồn tại
@@ -85,6 +83,7 @@ public class CartItemServiceImpl implements CartItemService {
         // Kiểm tra số lượng sản phẩm trong kho trước khi cập nhật
         checkProductAvailability(cartItem.getProductId(), cartItem.getQuantity());
         // Cập nhật giá trị của CartItem
+
         existingCartItem.setPrice(cartItem.getPrice());
         existingCartItem.setProductId(cartItem.getProductId());
         existingCartItem.setQuantity(cartItem.getQuantity());
@@ -94,7 +93,6 @@ public class CartItemServiceImpl implements CartItemService {
 
     // Xóa chi tiết giỏ hàng
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or @cartSecurityExpression.isCartItemOwner(#cartItemId)")
     public boolean deleteCartItem(Long cartItemId) {
         log.info("Xóa chi tiết giỏ hàng với ID: {}", cartItemId);
         if (cartItemRepository.existsById(cartItemId)) {
@@ -108,6 +106,24 @@ public class CartItemServiceImpl implements CartItemService {
     // Lấy chi tiết giỏ hàng theo ID
     public CartItem getCartItemById(Long cartItemId) {
         return cartItemRepository.findById(cartItemId).orElse(null); // Trả về null nếu không tìm thấy
+    }
+
+    @Override
+    public boolean plus(CartItem cartItem) {
+        cartItem.setQuantity(cartItem.getQuantity() + 1);
+        cartItemRepository.save(cartItem);
+        return true;
+    }
+
+    @Override
+    public boolean minus(CartItem cartItem) {
+        cartItem.setQuantity(cartItem.getQuantity() - 1);
+        if(cartItem.getQuantity() > 1) {
+            cartItemRepository.save(cartItem);
+        }else {
+            cartItemRepository.delete(cartItem);
+        }
+        return true;
     }
 
     private void checkProductAvailability(Long productId, int quantity) {

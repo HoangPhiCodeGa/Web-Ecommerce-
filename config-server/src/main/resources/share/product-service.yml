@@ -2,9 +2,9 @@ server:
   port: 9898
   # Datasource configuration
 cloudinary:
-  cloud-name: ${CLOUD_NAME}
-  api-key: ${API_KEY_CLOUDINARY}
-  api-secret: ${API_SECRET_KEY_CLOUDINARY}
+  cloud-name: ${CLOUD_NAME:khnguo}
+  api-key: ${API_KEY_CLOUDINARY:628811148441892}
+  api-secret: ${API_SECRET_KEY_CLOUDINARY:SvYSr1U91ZK-E3SbR_NXIWTZb0I}
 spring:
   application:
     name: product-service

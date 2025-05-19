@@ -19,6 +19,6 @@ import java.io.UnsupportedEncodingException;
  * @created: 25-April-2025 11:00 PM
  */
 public interface PaymentService {
-    public String createVNPPayment(HttpServletRequest request, long amountRequest) throws UnsupportedEncodingException;
+    public String createVNPPayment(HttpServletRequest request, long amountRequest, long idOrder) throws UnsupportedEncodingException;
 }
 
